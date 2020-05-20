@@ -1,0 +1,26 @@
+glass<-read.csv(file.choose())
+
+glass$Type<-factor(glass$Type,  levels = c("1","2","3","5","6","7"), labels = c("c1","c2","c3","c5","c6","c7"))
+
+table(glass$Type)
+normalize<- function(x){
+  return((x-min(x))/(max(x)-min(x)))
+}
+glass_norm<-as.data.frame(lapply(glass[1:9], normalize))
+summary(glass_norm)
+
+
+glass_train<-glass_norm[1:140,]
+glass_test<-glass_norm[141:214,]
+
+
+glass_train_label<-glass[1:140,10]
+glass_test_label<-glass[141:214,10]
+
+install.packages("class")
+library(class)
+glass_pred <- knn(train = glass_train,test = glass_test,cl=glass_train_label,k=2)
+install.packages("gmodels")
+library(gmodels)
+CrossTable(x=glass_test_label,y=glass_pred,prop.chisq = FALSE)
+finalmodel<-knn(train = glass_norm,test = glass_norm,cl=glass$Type,k=1)
